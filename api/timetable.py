@@ -1,30 +1,36 @@
 from http.server import BaseHTTPRequestHandler
-from pycomcigan import TimeTable, get_school_code
+import requests
 import json
 
 
-SCHOOL_NAME = "신일비즈니스고등학교"
+COMCI_URL = "http://comci.net:4082/36179?NzM2MjlfNjQzNThfMF8x"
 
 
 class handler(BaseHTTPRequestHandler):
     def do_GET(self):
         try:
-            # 1. 학교 검색부터 확인
-            schools = get_school_code("신일비즈니스")
-
-            result = {
-                "school_search": schools
+            headers = {
+                "User-Agent": (
+                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                    "AppleWebKit/537.36 (KHTML, like Gecko) "
+                    "Chrome/134.0 Safari/537.36"
+                ),
+                "Referer": "http://comci.net/"
             }
 
-            # 2. 시간표 객체 생성
-            timetable = TimeTable(
-                SCHOOL_NAME,
-                week_num=0
+            response = requests.get(
+                COMCI_URL,
+                headers=headers,
+                timeout=15
             )
 
-            # 3. 전체 timetable 구조를 문자열로 확인
-            result["timetable_type"] = str(type(timetable.timetable))
-            result["timetable_raw"] = timetable.timetable
+            result = {
+                "success": True,
+                "status": response.status_code,
+                "content_type": response.headers.get("content-type"),
+                "encoding": response.encoding,
+                "text": response.text
+            }
 
             self.send_response(200)
             self.send_header(
@@ -36,8 +42,7 @@ class handler(BaseHTTPRequestHandler):
             self.wfile.write(
                 json.dumps(
                     result,
-                    ensure_ascii=False,
-                    default=str
+                    ensure_ascii=False
                 ).encode("utf-8")
             )
 
