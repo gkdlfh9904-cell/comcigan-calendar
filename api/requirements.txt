@@ -1,1 +1,1 @@
-comcigan
+pycomcigan==1.4.0
