@@ -1,0 +1,8 @@
+{
+  "name": "comcigan-calendar",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "comcigan-parser": "^1.0.0"
+  }
+}
